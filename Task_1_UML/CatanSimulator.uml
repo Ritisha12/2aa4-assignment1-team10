@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_1GB3IPyPEfC0vcV36m9xng" name="CatanSimulator">
+  <packagedElement xmi:type="uml:Package" xmi:id="_w2LxUP05EfCuVJa8ppXoew" name="player">
+    <packagedElement xmi:type="uml:Class" xmi:id="_zc-NYP05EfCuVJa8ppXoew" name="Player" visibility="package">
+      <ownedAttribute xmi:id="__VfTgP05EfCuVJa8ppXoew" name="id" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_d9c7UP06EfCuVJa8ppXoew" name="Name" visibility="private" aggregation="shared">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_jw9YwP0_EfCuVJa8ppXoew" name="VictoryPoint" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_qUMxYP1BEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_KtCcwP1JEfCuVJa8ppXoew" name="ResourceHand">
+      <ownedAttribute xmi:id="_S4VDMP1JEfCuVJa8ppXoew" name="wood" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_YDb2IP1JEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_bDmbgP1JEfCuVJa8ppXoew" name="brick" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_eYgh0P1JEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_fzD0QP1JEfCuVJa8ppXoew" name="sheep" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_1feA4P1KEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_2SagwP1KEfCuVJa8ppXoew" name="ore" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_6CPBcP1KEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_6wufIP1KEfCuVJa8ppXoew" name="wheat" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_9fFi0P1KEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_qlQvYP1FEfCuVJa8ppXoew" name="resources">
+    <packagedElement xmi:type="uml:Class" xmi:id="_hQH6EP1HEfCuVJa8ppXoew" name="ResourceCost">
+      <ownedAttribute xmi:id="_lylYoP1HEfCuVJa8ppXoew" name="wood" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_vfbRYP1HEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_wN0BYP1HEfCuVJa8ppXoew" name="brick" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_1vgIUP1HEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_2fwgkP1HEfCuVJa8ppXoew" name="sheep" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_8SEdcP1HEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_GLD70P1IEfCuVJa8ppXoew" name="wheat" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_kOsHgP1IEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_uGDOMP1IEfCuVJa8ppXoew" name="ore" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        <defaultValue xmi:type="uml:LiteralInteger" xmi:id="_01BnoP1IEfCuVJa8ppXoew" name="LiteralInteger1"/>
+      </ownedAttribute>
+      <ownedOperation xmi:id="_HW2SIP1LEfCuVJa8ppXoew" name="addResource">
+        <ownedParameter xmi:id="_949MoP1QEfCuVJa8ppXoew" name="type"/>
+        <ownedParameter xmi:id="_MrxEMP1SEfCuVJa8ppXoew" name="amount" visibility="public" effect="read">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_DIhkoP1YEfCuVJa8ppXoew" name="removeResource">
+        <ownedParameter xmi:id="_FlCqYP1YEfCuVJa8ppXoew" name="type"/>
+        <ownedParameter xmi:id="_JvDzwP1YEfCuVJa8ppXoew" name="amount">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+        <ownedParameter xmi:id="_jemUEP1YEfCuVJa8ppXoew" name="return" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Boolean"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_vCgcIP1YEfCuVJa8ppXoew" name="getTotalCards">
+        <ownedParameter xmi:id="_yZrzUP1YEfCuVJa8ppXoew" name="return" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_2efskP1YEfCuVJa8ppXoew" name="clear"/>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_tf24QP1FEfCuVJa8ppXoew" name="utils">
+    <packagedElement xmi:type="uml:Class" xmi:id="_GfrUYP1dEfCuVJa8ppXoew" name="Dice">
+      <ownedOperation xmi:id="_XlIAIP1iEfCuVJa8ppXoew" name="roll">
+        <ownedParameter xmi:id="_b_t8IP1iEfCuVJa8ppXoew" name="result" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_fpuIsP1iEfCuVJa8ppXoew" name="rollSingleDie">
+        <ownedParameter xmi:id="_kYXpIP1iEfCuVJa8ppXoew" name="result" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_poXjIP1iEfCuVJa8ppXoew" name="ActionLogger"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_wm13UP1FEfCuVJa8ppXoew" name="board">
+    <packagedElement xmi:type="uml:Class" xmi:id="_ybN40P1iEfCuVJa8ppXoew" name="Tile">
+      <ownedAttribute xmi:id="_2PSnYP1iEfCuVJa8ppXoew" name="id" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_97Ue8P1iEfCuVJa8ppXoew" name="resourceType" visibility="private"/>
+      <ownedAttribute xmi:id="_HPPhYP1jEfCuVJa8ppXoew" name="numberToken" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:id="_Kz7JEP1jEfCuVJa8ppXoew" name="hasRobber" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Boolean"/>
+        <defaultValue xmi:type="uml:LiteralBoolean" xmi:id="_QcG5kP1jEfCuVJa8ppXoew" name="LiteralBoolean1"/>
+      </ownedAttribute>
+      <ownedOperation xmi:id="_UuoesP1jEfCuVJa8ppXoew" name="produceResource">
+        <ownedParameter xmi:id="_Zy5CwP1jEfCuVJa8ppXoew" name="return" direction="return"/>
+      </ownedOperation>
+      <ownedOperation xmi:id="_eF9acP1jEfCuVJa8ppXoew" name="getId">
+        <ownedParameter xmi:id="_gMlIsP1jEfCuVJa8ppXoew" name="return" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_jbxBgP1jEfCuVJa8ppXoew" name="getNumberToken">
+        <ownedParameter xmi:id="_rGYj0P1jEfCuVJa8ppXoew" name="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_zT3eQP1FEfCuVJa8ppXoew" name="buildings">
+    <packagedElement xmi:type="uml:Class" xmi:id="_qA7iMP1kEfCuVJa8ppXoew" name="Building" isAbstract="true">
+      <ownedAttribute xmi:id="_Dvr_YP1lEfCuVJa8ppXoew" name="vistoryPointValue" visibility="private"/>
+      <ownedOperation xmi:id="_Yd6sgP1mEfCuVJa8ppXoew" name="getVictoryPoints" isAbstract="true">
+        <ownedParameter xmi:id="_ttvq0P1nEfCuVJa8ppXoew" name="return" direction="return">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+        </ownedParameter>
+      </ownedOperation>
+      <ownedOperation xmi:id="_ikQDUP1mEfCuVJa8ppXoew" name="getCost" isAbstract="true">
+        <ownedParameter xmi:id="_k3QnwP1mEfCuVJa8ppXoew" name="return" type="_hQH6EP1HEfCuVJa8ppXoew" direction="return"/>
+      </ownedOperation>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_tkQiMP1oEfCuVJa8ppXoew" name="Settlement"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Package" xmi:id="_2HsQwP1FEfCuVJa8ppXoew" name="core"/>
+</uml:Model>
