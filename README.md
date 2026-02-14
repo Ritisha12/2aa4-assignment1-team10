@@ -1,0 +1,8 @@
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
