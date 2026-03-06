@@ -6,3 +6,4 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Ritisha12_2aa4-assignment1-team10&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Ritisha12_2aa4-assignment1-team10)
