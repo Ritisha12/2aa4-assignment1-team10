@@ -16,6 +16,10 @@ public class Board {
 
     // builds the entire board from the MapSetup data
     public void generateMap() {
+        tiles.clear();
+        nodes.clear();
+        edges.clear();
+
         // create all 54 nodes
         for (int i = 0; i < MapSetup.NUM_NODES; i++) {
             nodes.add(new Node(i));
@@ -68,4 +72,49 @@ public class Board {
     public List<Tile> getTiles() { return tiles; }
     public List<Node> getNodes() { return nodes; }
     public List<Edge> getEdges() { return edges; }
+
+    public Node getNodeById(int id) {
+        if (id < 0 || id >= nodes.size()) {
+            return null;
+        }
+        return nodes.get(id);
+    }
+
+    public Tile getTileById(int id) {
+        if (id < 0 || id >= tiles.size()) {
+            return null;
+        }
+        return tiles.get(id);
+    }
+
+    public Edge getEdgeByNodeIds(int nodeId1, int nodeId2) {
+        for (Edge edge : edges) {
+            int edgeNode1 = edge.getNode1().getId();
+            int edgeNode2 = edge.getNode2().getId();
+            if ((edgeNode1 == nodeId1 && edgeNode2 == nodeId2)
+                || (edgeNode1 == nodeId2 && edgeNode2 == nodeId1)) {
+                return edge;
+            }
+        }
+        return null;
+    }
+
+    public Tile getRobberTile() {
+        for (Tile tile : tiles) {
+            if (tile.hasRobber()) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    public void moveRobber(Tile destination) {
+        if (destination == null) {
+            return;
+        }
+        for (Tile tile : tiles) {
+            tile.setRobber(false);
+        }
+        destination.setRobber(true);
+    }
 }

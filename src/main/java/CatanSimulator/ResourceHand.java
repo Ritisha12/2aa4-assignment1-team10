@@ -1,5 +1,7 @@
 package CatanSimulator;
 
+import java.util.Random;
+
 // tracks how many of each resource a player has
 public class ResourceHand {
     private int wood;
@@ -52,6 +54,63 @@ public class ResourceHand {
 
     public int getTotalCards() {
         return wood + brick + sheep + wheat + ore;
+    }
+
+    public int getCount(ResourceType type) {
+        switch (type) {
+            case WOOD: return wood;
+            case BRICK: return brick;
+            case SHEEP: return sheep;
+            case WHEAT: return wheat;
+            case ORE: return ore;
+            default: return 0;
+        }
+    }
+
+    public boolean tradeFourToOne(ResourceType give, ResourceType receive) {
+        if (give == null || receive == null || give == receive || receive == ResourceType.DESERT) {
+            return false;
+        }
+        if (!removeResource(give, 4)) {
+            return false;
+        }
+        addResource(receive, 1);
+        return true;
+    }
+
+    public ResourceType removeRandomResource(Random random) {
+        int totalCards = getTotalCards();
+        if (totalCards == 0) {
+            return null;
+        }
+
+        int chosenIndex = random.nextInt(totalCards) + 1;
+        int runningTotal = wood;
+        if (chosenIndex <= runningTotal) {
+            wood--;
+            return ResourceType.WOOD;
+        }
+
+        runningTotal += brick;
+        if (chosenIndex <= runningTotal) {
+            brick--;
+            return ResourceType.BRICK;
+        }
+
+        runningTotal += sheep;
+        if (chosenIndex <= runningTotal) {
+            sheep--;
+            return ResourceType.SHEEP;
+        }
+
+        runningTotal += wheat;
+        if (chosenIndex <= runningTotal) {
+            wheat--;
+            return ResourceType.WHEAT;
+        }
+
+        ore--;
+        return ResourceType.ORE;
     }
 
     public int getWood() { return wood; }

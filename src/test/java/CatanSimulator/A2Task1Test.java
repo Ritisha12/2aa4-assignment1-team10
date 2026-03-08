@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *   - BoardTest         : tests for Board structure after generateMap()
  *
  */
-public class testA2Task1 {
+public class A2Task1Test {
 
     // SUITE 1: ResourceHand Tests
 

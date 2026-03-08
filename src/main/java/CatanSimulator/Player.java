@@ -7,6 +7,7 @@ import java.util.Random;
 public class Player {
     private int id;
     private String name;
+    private PlayerColor color;
     private int victoryPoints;
     private ResourceHand resources;
     private List<Road> roads;
@@ -15,8 +16,13 @@ public class Player {
     private Random random;
 
     public Player(int id, String name) {
+        this(id, name, PlayerColor.forPlayerId(id));
+    }
+
+    public Player(int id, String name, PlayerColor color) {
         this.id = id;
         this.name = name;
+        this.color = color;
         this.victoryPoints = 0;
         this.resources = new ResourceHand();
         this.roads = new ArrayList<>();
@@ -66,13 +72,17 @@ public class Player {
             if (ok) return true;
         }
 
-        logger.logAction(round, this, "No valid actions available");
         return false;
     }
 
-    // used when player has >7 cards and needs to spend
-    public boolean tryToBuild(Board board, ActionLogger logger, int round) {
-        return takeTurn(board, logger, round);
+    public boolean tryBankTradeForBuild(Board board, ActionLogger logger, int round) {
+        if (tryBankTradeForSettlement(board, logger, round)) {
+            return true;
+        }
+        if (tryBankTradeForCity(board, logger, round)) {
+            return true;
+        }
+        return tryBankTradeForRoad(board, logger, round);
     }
 
     private boolean canAffordSettlement() {
@@ -93,7 +103,7 @@ public class Player {
         }
         if (!valid.isEmpty()) {
             Node chosen = valid.get(random.nextInt(valid.size()));
-            return buildSettlement(chosen, logger, round);
+            return buildSettlementAt(chosen, logger, round);
         }
         return false;
     }
@@ -105,7 +115,7 @@ public class Player {
         }
         if (!valid.isEmpty()) {
             Node chosen = valid.get(random.nextInt(valid.size()));
-            return buildCity(chosen, logger, round);
+            return buildCityAt(chosen, logger, round);
         }
         return false;
     }
@@ -117,47 +127,172 @@ public class Player {
         }
         if (!valid.isEmpty()) {
             Edge chosen = valid.get(random.nextInt(valid.size()));
-            return buildRoad(chosen, logger, round);
+            return buildRoadAt(chosen, logger, round);
         }
         return false;
     }
 
-    private boolean buildSettlement(Node node, ActionLogger logger, int round) {
+    private boolean tryBankTradeForSettlement(Board board, ActionLogger logger, int round) {
+        Node target = null;
+        for (Node node : board.getNodes()) {
+            if (node.canBuildSettlement(this)) {
+                target = node;
+                break;
+            }
+        }
+        if (target == null) {
+            return false;
+        }
+        if (!tradeForMissingSingleResource(new Settlement(this).getCost(), logger, round)) {
+            return false;
+        }
+        return buildSettlementAt(target, logger, round);
+    }
+
+    private boolean tryBankTradeForCity(Board board, ActionLogger logger, int round) {
+        Node target = null;
+        for (Node node : board.getNodes()) {
+            if (node.canUpgradeToCity(this)) {
+                target = node;
+                break;
+            }
+        }
+        if (target == null) {
+            return false;
+        }
+        if (!tradeForMissingSingleResource(new City(this).getCost(), logger, round)) {
+            return false;
+        }
+        return buildCityAt(target, logger, round);
+    }
+
+    private boolean tryBankTradeForRoad(Board board, ActionLogger logger, int round) {
+        Edge target = null;
+        for (Edge edge : board.getEdges()) {
+            if (edge.canBuildRoad(this)) {
+                target = edge;
+                break;
+            }
+        }
+        if (target == null) {
+            return false;
+        }
+        if (!tradeForMissingSingleResource(new Road(this, target).getCost(), logger, round)) {
+            return false;
+        }
+        return buildRoadAt(target, logger, round);
+    }
+
+    private boolean tradeForMissingSingleResource(ResourceCost cost, ActionLogger logger, int round) {
+        ResourceType missing = findSingleMissingResource(cost);
+        if (missing == null) {
+            return false;
+        }
+
+        ResourceType give = findTradeSource(missing);
+        if (give == null || !resources.tradeFourToOne(give, missing)) {
+            return false;
+        }
+
+        logger.logAction(round, this, "Traded 4 " + give + " for 1 " + missing);
+        return true;
+    }
+
+    private ResourceType findSingleMissingResource(ResourceCost cost) {
+        ResourceType missing = null;
+
+        missing = updateMissingResource(missing, ResourceType.WOOD, cost.getWood());
+        if (missing == ResourceType.DESERT) return null;
+
+        missing = updateMissingResource(missing, ResourceType.BRICK, cost.getBrick());
+        if (missing == ResourceType.DESERT) return null;
+
+        missing = updateMissingResource(missing, ResourceType.SHEEP, cost.getSheep());
+        if (missing == ResourceType.DESERT) return null;
+
+        missing = updateMissingResource(missing, ResourceType.WHEAT, cost.getWheat());
+        if (missing == ResourceType.DESERT) return null;
+
+        missing = updateMissingResource(missing, ResourceType.ORE, cost.getOre());
+        if (missing == ResourceType.DESERT) return null;
+
+        return missing;
+    }
+
+    private ResourceType updateMissingResource(ResourceType currentMissing, ResourceType type, int required) {
+        int deficit = required - resources.getCount(type);
+        if (deficit <= 0) {
+            return currentMissing;
+        }
+        if (deficit > 1 || currentMissing != null) {
+            return ResourceType.DESERT;
+        }
+        return type;
+    }
+
+    private ResourceType findTradeSource(ResourceType missing) {
+        ResourceType chosen = null;
+        int bestCount = 0;
+
+        for (ResourceType candidate : List.of(
+            ResourceType.WOOD,
+            ResourceType.BRICK,
+            ResourceType.SHEEP,
+            ResourceType.WHEAT,
+            ResourceType.ORE
+        )) {
+            if (candidate == missing) {
+                continue;
+            }
+            int count = resources.getCount(candidate);
+            if (count >= 4 && count > bestCount) {
+                chosen = candidate;
+                bestCount = count;
+            }
+        }
+
+        return chosen;
+    }
+
+    public boolean buildSettlementAt(Node node, ActionLogger logger, int round) {
+        if (node == null) return false;
         Settlement s = new Settlement(this);
-        if (s.getCost().canAfford(resources)) {
-            s.getCost().deductFrom(resources);
-            node.placeBuilding(s);
-            settlements.add(s);
-            victoryPoints += s.getVictoryPoints();
-            logger.logAction(round, this, "Built settlement at node " + node.getId());
-            return true;
-        }
-        return false;
+        if (!s.getCost().canAfford(resources) || !node.canBuildSettlement(this)) return false;
+        if (!node.placeBuilding(s)) return false;
+
+        s.getCost().deductFrom(resources);
+        settlements.add(s);
+        victoryPoints += s.getVictoryPoints();
+        logger.logAction(round, this, "Built settlement at node " + node.getId());
+        return true;
     }
 
-    private boolean buildCity(Node node, ActionLogger logger, int round) {
+    public boolean buildCityAt(Node node, ActionLogger logger, int round) {
+        if (node == null) return false;
         City c = new City(this);
-        if (c.getCost().canAfford(resources)) {
-            c.getCost().deductFrom(resources);
-            node.upgradeToCity(c);
-            cities.add(c);
-            victoryPoints += 1; // net gain is +1 (was 1 for settlement, now 2 for city)
-            logger.logAction(round, this, "Upgraded settlement to city at node " + node.getId());
-            return true;
+        if (!c.getCost().canAfford(resources) || !node.canUpgradeToCity(this)) return false;
+        if (!node.upgradeToCity(c)) return false;
+
+        c.getCost().deductFrom(resources);
+        if (!settlements.isEmpty()) {
+            settlements.remove(settlements.size() - 1);
         }
-        return false;
+        cities.add(c);
+        victoryPoints += 1; // net gain is +1 (was 1 for settlement, now 2 for city)
+        logger.logAction(round, this, "Upgraded settlement to city at node " + node.getId());
+        return true;
     }
 
-    private boolean buildRoad(Edge edge, ActionLogger logger, int round) {
+    public boolean buildRoadAt(Edge edge, ActionLogger logger, int round) {
+        if (edge == null) return false;
         Road r = new Road(this, edge);
-        if (r.getCost().canAfford(resources)) {
-            r.getCost().deductFrom(resources);
-            edge.placeRoad(r);
-            roads.add(r);
-            logger.logAction(round, this, "Built road at edge " + edge.getId());
-            return true;
-        }
-        return false;
+        if (!r.getCost().canAfford(resources) || !edge.canBuildRoad(this)) return false;
+        if (!edge.placeRoad(r)) return false;
+
+        r.getCost().deductFrom(resources);
+        roads.add(r);
+        logger.logAction(round, this, "Built road at edge " + edge.getId());
+        return true;
     }
 
     // initial placement stuff (free, no road connectivity needed)
@@ -189,8 +324,24 @@ public class Player {
         return resources.getTotalCards() > limit;
     }
 
+    public int discardRandomCards(int count, Random random) {
+        int discarded = 0;
+        for (int i = 0; i < count; i++) {
+            if (resources.removeRandomResource(random) == null) {
+                break;
+            }
+            discarded++;
+        }
+        return discarded;
+    }
+
+    public ResourceType stealRandomResource(Random random) {
+        return resources.removeRandomResource(random);
+    }
+
     public int getId() { return id; }
     public String getName() { return name; }
+    public PlayerColor getColor() { return color; }
     public int getVictoryPoints() { return victoryPoints; }
     public ResourceHand getResources() { return resources; }
     public int getRoadCount() { return roads.size(); }

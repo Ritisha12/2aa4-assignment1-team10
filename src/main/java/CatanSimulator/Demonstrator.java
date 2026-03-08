@@ -1,22 +1,31 @@
 package CatanSimulator;
 
 // Demonstrator for the Settlers of Catan simulator.
-// Running this will set up the board, create 4 players, and simulate a full game.
+// Running this will set up the board, create 1 human player + 3 AI players,
+// and simulate a full Assignment 2 game.
 //
 // Key things to observe:
 // - Board is set up from MapSetup with 19 tiles, 54 nodes, and edges (R1.1)
-// - 4 random agents that pick build actions randomly (R1.2)
-// - Game follows catan rules: roll dice, collect resources, build (R1.3)
+// - Player 0 is human-controlled through command-line commands (R2.1)
+// - The game exports target/visualizer/state.json for the instructor visualizer (R2.2, R2.3)
+// - Type "go" at the advance prompt to step to the next player's turn (R2.4)
+// - Human commands are: roll, list, build settlement <node>, build city <node>,
+//   build road <fromNode>, <toNode>, and go
+// - Rolling a 7 triggers the simplified robber flow from Assignment 2 (R2.5)
 // - Game runs for configurable number of rounds or until 10 VP (R1.4, R1.5)
-// - Distance rule, road connectivity, and city upgrades are enforced (R1.6)
-// - Actions printed as [Round] / [PlayerID]: [Action], VP shown each round (R1.7)
-// - Players with >7 cards try to build to spend them (R1.8)
+// - Actions are printed as [Round] / [PlayerID]: [Action]
+//
+// To watch the board, run the instructor visualizer from target/visualizer so it
+// watches the generated state.json file there, for example:
+//   cd target/visualizer
+//   python /path/to/2aa4-2026-base/assignments/visualize/light_visualizer.py \
+//     /path/to/2aa4-2026-base/assignments/visualize/base_map.json --watch
 public class Demonstrator {
 
     public static void main(String[] args) {
         System.out.println("============================================================");
         System.out.println("  SETTLERS OF CATAN SIMULATOR");
-        System.out.println("  SFWRENG 2AA4 - Assignment 1");
+        System.out.println("  SFWRENG 2AA4 - Assignment 2");
         System.out.println("============================================================");
         System.out.println();
 

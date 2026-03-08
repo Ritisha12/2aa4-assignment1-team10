@@ -33,4 +33,10 @@ public class ResourceCost {
             hand.removeResource(ResourceType.ORE, ore);
         }
     }
+
+    public int getWood() { return wood; }
+    public int getBrick() { return brick; }
+    public int getSheep() { return sheep; }
+    public int getWheat() { return wheat; }
+    public int getOre() { return ore; }
 }
