@@ -16,6 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  */
 public class A2Task1Test {
+    private static class TestPlayer extends Player {
+        TestPlayer(int id, String name) {
+            super(id, name);
+        }
+
+        TestPlayer(int id, String name, PlayerColor color) {
+            super(id, name, color);
+        }
+    }
 
     // SUITE 1: ResourceHand Tests
 
@@ -62,7 +71,7 @@ public class A2Task1Test {
         @Test
         @DisplayName("Partition A: 0 cards - hasMoreThanCards(7) is false")
         void testPartitionEmptyHand() {
-            Player p = new Player(1, "TestPlayer");
+            Player p = new TestPlayer(1, "TestPlayer");
             assertFalse(p.hasMoreThanCards(7));
         }
 
@@ -77,7 +86,7 @@ public class A2Task1Test {
         @Test
         @DisplayName("Partition C: 8 cards - hasMoreThanCards(7) is true")
         void testPartitionOverSevenCards() {
-            Player p = new Player(1, "TestPlayer");
+            Player p = new TestPlayer(1, "TestPlayer");
             p.getResources().addResource(ResourceType.WOOD, 4);
             p.getResources().addResource(ResourceType.BRICK, 4);
             assertTrue(p.hasMoreThanCards(7));
@@ -123,7 +132,7 @@ public class A2Task1Test {
             Node node2 = new Node(1);
             node1.addAdjacentNode(node2);
             node2.addAdjacentNode(node1);
-            Player p = new Player(1, "Alice");
+            Player p = new TestPlayer(1, "Alice");
             node1.placeBuilding(new Settlement(p));
             assertFalse(node2.canBuildInitialSettlement());
         }
@@ -132,7 +141,7 @@ public class A2Task1Test {
         @DisplayName("Can't place second building on already occupied node")
         void testCannotDoublePlace() {
             Node node = new Node(0);
-            Player p = new Player(1, "Alice");
+            Player p = new TestPlayer(1, "Alice");
             node.placeBuilding(new Settlement(p));
             assertFalse(node.placeBuilding(new Settlement(p)));
         }
@@ -141,8 +150,8 @@ public class A2Task1Test {
         @DisplayName("canUpgradeToCity is false when another player owns the settlement")
         void testCannotUpgradeCityOfOtherPlayer() {
             Node node = new Node(0);
-            Player p1 = new Player(1, "Alice");
-            Player p2 = new Player(2, "Bob");
+            Player p1 = new TestPlayer(1, "Alice");
+            Player p2 = new TestPlayer(2, "Bob");
             node.placeBuilding(new Settlement(p1));
             assertFalse(node.canUpgradeToCity(p2));
         }
@@ -151,7 +160,7 @@ public class A2Task1Test {
         @DisplayName("upgradeToCity replaces settlement with city")
         void testUpgradeToCitySucceeds() {
             Node node = new Node(0);
-            Player p = new Player(1, "Alice");
+            Player p = new TestPlayer(1, "Alice");
             node.placeBuilding(new Settlement(p));
             assertTrue(node.upgradeToCity(new City(p)));
             assertInstanceOf(City.class, node.getBuilding());
@@ -167,14 +176,14 @@ public class A2Task1Test {
         @Test
         @DisplayName("New player starts with 0 victory points")
         void testInitialVP() {
-            Player p = new Player(1, "Alice");
+            Player p = new TestPlayer(1, "Alice");
             assertEquals(0, p.getVictoryPoints());
         }
 
         @Test
         @DisplayName("New player starts with 0 roads, settlements, cities")
         void testInitialCounts() {
-            Player p = new Player(1, "Alice");
+            Player p = new TestPlayer(1, "Alice");
             assertEquals(0, p.getRoadCount());
             assertEquals(0, p.getSettlementCount());
             assertEquals(0, p.getCityCount());
@@ -183,7 +192,7 @@ public class A2Task1Test {
         @Test
         @DisplayName("placeInitialSettlement increases VP by 1")
         void testInitialSettlementAddsVP() {
-            Player p = new Player(1, "Alice");
+            Player p = new TestPlayer(1, "Alice");
             p.placeInitialSettlement(new Node(0));
             assertEquals(1, p.getVictoryPoints());
         }
@@ -191,7 +200,7 @@ public class A2Task1Test {
         @Test
         @DisplayName("Player ID and name stored correctly")
         void testPlayerIdAndName() {
-            Player p = new Player(3, "Charlie");
+            Player p = new TestPlayer(3, "Charlie");
             assertEquals(3, p.getId());
             assertEquals("Charlie", p.getName());
         }

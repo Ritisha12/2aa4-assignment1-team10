@@ -7,11 +7,13 @@ public class Board {
     private List<Tile> tiles;
     private List<Node> nodes;
     private List<Edge> edges;
+    private Robber robber;
 
     public Board() {
         tiles = new ArrayList<>();
         nodes = new ArrayList<>();
         edges = new ArrayList<>();
+        robber = new Robber();
     }
 
     // builds the entire board from the MapSetup data
@@ -29,6 +31,8 @@ public class Board {
         for (int i = 0; i < MapSetup.NUM_TILES; i++) {
             tiles.add(new Tile(i, MapSetup.TILE_RESOURCES[i], MapSetup.TILE_NUMBERS[i]));
         }
+        robber = new Robber();
+        robber.placeOn(findDesertTile());
 
         // hook up tile-node adjacencies
         for (int t = 0; t < MapSetup.NUM_TILES; t++) {
@@ -100,21 +104,23 @@ public class Board {
     }
 
     public Tile getRobberTile() {
+        return robber.getCurrentTile();
+    }
+
+    public void moveRobber(Tile destination) {
+        robber.placeOn(destination);
+    }
+
+    public Robber getRobber() {
+        return robber;
+    }
+
+    private Tile findDesertTile() {
         for (Tile tile : tiles) {
-            if (tile.hasRobber()) {
+            if (tile.getResourceType() == ResourceType.DESERT) {
                 return tile;
             }
         }
         return null;
-    }
-
-    public void moveRobber(Tile destination) {
-        if (destination == null) {
-            return;
-        }
-        for (Tile tile : tiles) {
-            tile.setRobber(false);
-        }
-        destination.setRobber(true);
     }
 }

@@ -14,7 +14,7 @@ public class Tile {
         this.id = id;
         this.resourceType = resourceType;
         this.numberToken = numberToken;
-        this.hasRobber = resourceType == ResourceType.DESERT;
+        this.hasRobber = false;
         this.adjacentNodes = new ArrayList<>();
     }
 

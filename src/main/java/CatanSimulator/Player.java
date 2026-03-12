@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Player {
+public abstract class Player {
     private int id;
     private String name;
     private PlayerColor color;

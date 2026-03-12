@@ -166,9 +166,9 @@ public class GameSimulator {
     }
 
     private void runHumanTurn(HumanPlayer player) {
-        boolean rolled = false;
+        TurnState state = TurnState.WAITING_FOR_ROLL;
 
-        while (true) {
+        while (state != TurnState.TURN_COMPLETE) {
             Command command = player.readCommand();
 
             switch (command.getType()) {
@@ -179,15 +179,15 @@ public class GameSimulator {
                     player.printHand();
                     break;
                 case ROLL:
-                    if (rolled) {
+                    if (state != TurnState.WAITING_FOR_ROLL) {
                         player.printMessage("You already rolled.");
                         break;
                     }
                     handleDiceRoll(player, player.rollDice(dice));
-                    rolled = true;
+                    state = TurnState.ACTION_PHASE;
                     break;
                 case BUILD_SETTLEMENT:
-                    if (!rolled) {
+                    if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
@@ -198,7 +198,7 @@ public class GameSimulator {
                     }
                     break;
                 case BUILD_CITY:
-                    if (!rolled) {
+                    if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
@@ -209,7 +209,7 @@ public class GameSimulator {
                     }
                     break;
                 case BUILD_ROAD:
-                    if (!rolled) {
+                    if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
@@ -221,11 +221,12 @@ public class GameSimulator {
                     }
                     break;
                 case GO:
-                    if (!rolled) {
+                    if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
-                    return;
+                    state = TurnState.TURN_COMPLETE;
+                    break;
                 default:
                     player.printMessage("Invalid command.");
                     break;

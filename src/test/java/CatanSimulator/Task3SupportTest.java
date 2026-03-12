@@ -12,6 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Task3SupportTest {
+    private static class TestPlayer extends Player {
+        TestPlayer(int id, String name) {
+            super(id, name);
+        }
+
+        TestPlayer(int id, String name, PlayerColor color) {
+            super(id, name, color);
+        }
+    }
 
     @Test
     @DisplayName("AI can use a 4:1 bank trade to complete a city upgrade")
@@ -19,7 +28,7 @@ public class Task3SupportTest {
         Board board = new Board();
         board.generateMap();
 
-        Player player = new Player(0, "Player0");
+        Player player = new TestPlayer(0, "Player0");
         Node cityNode = board.getNodeById(0);
         player.placeInitialSettlement(cityNode);
 
@@ -43,8 +52,8 @@ public class Task3SupportTest {
         Board board = new Board();
         board.generateMap();
 
-        Player player = new Player(0, "Player0");
-        Player blocker = new Player(1, "Blocker");
+        Player player = new TestPlayer(0, "Player0");
+        Player blocker = new TestPlayer(1, "Blocker");
         Node cityNode = board.getNodeById(0);
         player.placeInitialSettlement(cityNode);
         for (Edge edge : cityNode.getAdjacentEdges()) {
@@ -83,8 +92,8 @@ public class Task3SupportTest {
         Board board = new Board();
         board.generateMap();
 
-        Player red = new Player(0, "Red", PlayerColor.RED);
-        Player blue = new Player(1, "Blue", PlayerColor.BLUE);
+        Player red = new TestPlayer(0, "Red", PlayerColor.RED);
+        Player blue = new TestPlayer(1, "Blue", PlayerColor.BLUE);
 
         Node cityNode = board.getNodeById(0);
         cityNode.placeBuilding(new Settlement(red));
