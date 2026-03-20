@@ -50,6 +50,14 @@ public class Edge {
         return false;
     }
 
+    /**
+     * Command Pattern support: remove the road from this edge.
+     * Used by BuildRoadCommand.undo().
+     */
+    public void removeRoad() {
+        this.road = null;
+    }
+
     public int getId() { return id; }
     public Road getRoad() { return road; }
     public Node getNode1() { return node1; }

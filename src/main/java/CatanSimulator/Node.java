@@ -69,6 +69,22 @@ public class Node {
         return false;
     }
 
+    /**
+     * Command Pattern support: remove the building from this node.
+     * Used by BuildSettlementCommand.undo().
+     */
+    public void removeBuilding() {
+        this.building = null;
+    }
+
+    /**
+     * Command Pattern support: downgrade a city back to a settlement.
+     * Used by BuildCityCommand.undo().
+     */
+    public void downgradeCityToSettlement(Settlement s) {
+        this.building = s;
+    }
+
     public void addAdjacentNode(Node node) {
         if (!adjacentNodes.contains(node)) adjacentNodes.add(node);
     }

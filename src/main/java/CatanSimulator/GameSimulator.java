@@ -13,7 +13,7 @@ import java.util.Random;
 import java.util.Set;
 
 // main game simulation class
-// handles the game loop, initial placements, win conditions, etc
+// handles the game loop, initial placements, win conditions, undo/redo
 public class GameSimulator {
     private int currentRound;
     private int currentTurnId;
@@ -26,6 +26,9 @@ public class GameSimulator {
     private BufferedReader input;
     private PrintStream output;
     private GameStateExporter exporter;
+
+    // Command Pattern: manages undo/redo history for human player actions
+    private CommandHistory commandHistory;
 
     public GameSimulator() {
         this(new BufferedReader(new InputStreamReader(System.in)), System.out);
@@ -43,11 +46,14 @@ public class GameSimulator {
         this.input = input;
         this.output = output;
         exporter = new GameStateExporter(Path.of("target", "visualizer", "state.json"));
+        commandHistory = new CommandHistory();
 
         players.add(new HumanPlayer(0, "Player0", PlayerColor.RED, input, output));
         players.add(new AIPlayer(1, "Player1", PlayerColor.BLUE));
         players.add(new AIPlayer(2, "Player2", PlayerColor.ORANGE));
         players.add(new AIPlayer(3, "Player3", PlayerColor.WHITE));
+
+
     }
 
     public void loadConfig(String filename) {
@@ -61,10 +67,8 @@ public class GameSimulator {
         System.out.println("Board initialized: " + board.getTiles().size() + " tiles, "
             + board.getNodes().size() + " nodes, " + board.getEdges().size() + " edges.\n");
 
-        // do initial placements first
         performInitialPlacements();
 
-        // main game loop
         boolean gameWon = false;
         while (currentRound < maxRounds && !gameWon) {
             currentRound++;
@@ -74,13 +78,15 @@ public class GameSimulator {
                 waitForGo();
                 currentTurnId++;
 
+                // clear history at the start of each human turn so undo
+                // doesn't bleed across turns
                 if (player instanceof HumanPlayer) {
+                    commandHistory.clear();
                     runHumanTurn((HumanPlayer) player);
                 } else {
                     runAiTurn(player);
                 }
 
-                // check if someone won
                 if (player.getVictoryPoints() >= 10) {
                     System.out.println("\n*** WINNER: " + player.getName()
                         + " with " + player.getVictoryPoints() + " victory points! ***");
@@ -89,15 +95,12 @@ public class GameSimulator {
                 }
             }
 
-            // print VP at end of round
             logger.logVictoryPoints(currentRound, players);
         }
 
         printGameState();
     }
 
-    // initial placements: each player gets 2 settlements + 2 roads for free
-    // first round forward, second round reverse
     private void performInitialPlacements() {
         System.out.println("=== Initial Placements ===");
 
@@ -105,7 +108,6 @@ public class GameSimulator {
             placeInitialSettlementAndRoad(player, false);
         }
 
-        // second settlement in reverse order, also collect starting resources
         List<Player> reversed = new ArrayList<>(players);
         Collections.reverse(reversed);
         for (Player player : reversed) {
@@ -116,7 +118,6 @@ public class GameSimulator {
     }
 
     private void placeInitialSettlementAndRoad(Player player, boolean collectResources) {
-        // find valid spots (distance rule only)
         List<Node> validNodes = new ArrayList<>();
         for (Node node : board.getNodes()) {
             if (node.canBuildInitialSettlement()) validNodes.add(node);
@@ -136,7 +137,6 @@ public class GameSimulator {
             player.collectStartingResources(chosen);
         }
 
-        // place a road next to the settlement
         List<Edge> validEdges = new ArrayList<>();
         for (Edge edge : chosen.getAdjacentEdges()) {
             if (edge.getRoad() == null) validEdges.add(edge);
@@ -173,11 +173,14 @@ public class GameSimulator {
 
             switch (command.getType()) {
                 case INVALID:
-                    player.printMessage("Invalid command.");
+                    player.printMessage("Invalid command. Try: roll, build settlement <id>, "
+                        + "build city <id>, build road <id1>,<id2>, list, undo, redo, go");
                     break;
+
                 case LIST:
                     player.printHand();
                     break;
+
                 case ROLL:
                     if (state != TurnState.WAITING_FOR_ROLL) {
                         player.printMessage("You already rolled.");
@@ -186,40 +189,72 @@ public class GameSimulator {
                     handleDiceRoll(player, player.rollDice(dice));
                     state = TurnState.ACTION_PHASE;
                     break;
+
                 case BUILD_SETTLEMENT:
                     if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
-                    if (player.buildSettlementAt(board.getNodeById(command.getFirstId()), logger, currentTurnId)) {
+                    Node sNode = board.getNodeById(command.getFirstId());
+                    GameCommand buildSettlement =
+                        new BuildSettlementCommand(player, sNode, logger, currentTurnId);
+                    if (commandHistory.executeCommand(buildSettlement)) {
                         exporter.export(board);
                     } else {
                         player.printMessage("Cannot build settlement there.");
                     }
                     break;
+
                 case BUILD_CITY:
                     if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
-                    if (player.buildCityAt(board.getNodeById(command.getFirstId()), logger, currentTurnId)) {
+                    Node cNode = board.getNodeById(command.getFirstId());
+                    GameCommand buildCity =
+                        new BuildCityCommand(player, cNode, logger, currentTurnId);
+                    if (commandHistory.executeCommand(buildCity)) {
                         exporter.export(board);
                     } else {
                         player.printMessage("Cannot build city there.");
                     }
                     break;
+
                 case BUILD_ROAD:
                     if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
                         break;
                     }
                     Edge edge = board.getEdgeByNodeIds(command.getFirstId(), command.getSecondId());
-                    if (player.buildRoadAt(edge, logger, currentTurnId)) {
+                    GameCommand buildRoad =
+                        new BuildRoadCommand(player, edge, logger, currentTurnId);
+                    if (commandHistory.executeCommand(buildRoad)) {
                         exporter.export(board);
                     } else {
                         player.printMessage("Cannot build road there.");
                     }
                     break;
+
+                case UNDO:
+                    if (commandHistory.canUndo()) {
+                        commandHistory.undo();
+                        exporter.export(board);
+                        player.printMessage("Undo successful.");
+                    } else {
+                        player.printMessage("Nothing to undo.");
+                    }
+                    break;
+
+                case REDO:
+                    if (commandHistory.canRedo()) {
+                        commandHistory.redo();
+                        exporter.export(board);
+                        player.printMessage("Redo successful.");
+                    } else {
+                        player.printMessage("Nothing to redo.");
+                    }
+                    break;
+
                 case GO:
                     if (state != TurnState.ACTION_PHASE) {
                         player.printMessage("Roll first.");
@@ -227,6 +262,7 @@ public class GameSimulator {
                     }
                     state = TurnState.TURN_COMPLETE;
                     break;
+
                 default:
                     player.printMessage("Invalid command.");
                     break;
@@ -256,10 +292,7 @@ public class GameSimulator {
 
     private void handleRobber(Player rollingPlayer) {
         for (Player player : players) {
-            if (!player.hasMoreThanCards(7)) {
-                continue;
-            }
-
+            if (!player.hasMoreThanCards(7)) continue;
             int discardCount = player.getResources().getTotalCards() / 2;
             int discarded = player.discardRandomCards(discardCount, random);
             logger.logAction(currentTurnId, player, "Discarded " + discarded + " cards due to robber");
@@ -268,14 +301,9 @@ public class GameSimulator {
         Tile currentRobberTile = board.getRobberTile();
         List<Tile> destinations = new ArrayList<>();
         for (Tile tile : board.getTiles()) {
-            if (tile != currentRobberTile) {
-                destinations.add(tile);
-            }
+            if (tile != currentRobberTile) destinations.add(tile);
         }
-
-        if (destinations.isEmpty()) {
-            return;
-        }
+        if (destinations.isEmpty()) return;
 
         Tile destination = destinations.get(random.nextInt(destinations.size()));
         board.moveRobber(destination);
@@ -283,14 +311,10 @@ public class GameSimulator {
         exporter.export(board);
 
         Player victim = findRobberVictim(destination, rollingPlayer);
-        if (victim == null) {
-            return;
-        }
+        if (victim == null) return;
 
         ResourceType stolenResource = victim.stealRandomResource(random);
-        if (stolenResource == null) {
-            return;
-        }
+        if (stolenResource == null) return;
 
         rollingPlayer.getResources().addResource(stolenResource, 1);
         logger.logAction(currentTurnId, rollingPlayer,
@@ -299,27 +323,15 @@ public class GameSimulator {
 
     private Player findRobberVictim(Tile robberTile, Player rollingPlayer) {
         Set<Player> candidates = new LinkedHashSet<>();
-
         for (Node node : robberTile.getAdjacentNodes()) {
             Building building = node.getBuilding();
-            if (building == null) {
-                continue;
-            }
-
+            if (building == null) continue;
             Player owner = building.getOwner();
-            if (owner.equals(rollingPlayer)) {
-                continue;
-            }
-            if (owner.getResources().getTotalCards() == 0) {
-                continue;
-            }
+            if (owner.equals(rollingPlayer)) continue;
+            if (owner.getResources().getTotalCards() == 0) continue;
             candidates.add(owner);
         }
-
-        if (candidates.isEmpty()) {
-            return null;
-        }
-
+        if (candidates.isEmpty()) return null;
         List<Player> candidateList = new ArrayList<>(candidates);
         return candidateList.get(random.nextInt(candidateList.size()));
     }
@@ -327,12 +339,9 @@ public class GameSimulator {
     private void waitForGo() {
         output.print("advance> ");
         output.flush();
-
         while (true) {
             String line = readLine();
-            if ("go".equalsIgnoreCase(line.trim())) {
-                return;
-            }
+            if ("go".equalsIgnoreCase(line.trim())) return;
             output.println("Type 'go' to continue.");
             output.print("advance> ");
             output.flush();
@@ -342,13 +351,27 @@ public class GameSimulator {
     private String readLine() {
         try {
             String line = input.readLine();
-            if (line == null) {
-                throw new IllegalStateException("Input stream closed.");
-            }
+            if (line == null) throw new IllegalStateException("Input stream closed.");
             return line;
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read step-forward command.", e);
         }
+    }
+
+    // -----------------------------------------------------------------------
+    // Public undo/redo API (used by Demonstrator / tests)
+    // -----------------------------------------------------------------------
+
+    public void undoLastAction() {
+        commandHistory.undo();
+    }
+
+    public boolean canUndo() {
+        return commandHistory.canUndo();
+    }
+
+    public boolean canRedo() {
+        return commandHistory.canRedo();
     }
 
     public void printGameState() {
@@ -357,7 +380,6 @@ public class GameSimulator {
         System.out.println("==================================================");
         System.out.println("Total rounds played: " + currentRound);
         System.out.println("\nFinal Standings:");
-
         for (Player p : players) {
             System.out.println("  " + p.getName() + " (ID: " + p.getId() + "):");
             System.out.println("    Victory Points: " + p.getVictoryPoints());

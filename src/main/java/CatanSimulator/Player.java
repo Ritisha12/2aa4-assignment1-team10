@@ -66,8 +66,8 @@ public abstract class Player {
             boolean ok = false;
             switch (action) {
                 case "settlement": ok = tryBuildSettlement(board, logger, round); break;
-                case "city": ok = tryBuildCity(board, logger, round); break;
-                case "road": ok = tryBuildRoad(board, logger, round); break;
+                case "city":       ok = tryBuildCity(board, logger, round);       break;
+                case "road":       ok = tryBuildRoad(board, logger, round);       break;
             }
             if (ok) return true;
         }
@@ -76,12 +76,8 @@ public abstract class Player {
     }
 
     public boolean tryBankTradeForBuild(Board board, ActionLogger logger, int round) {
-        if (tryBankTradeForSettlement(board, logger, round)) {
-            return true;
-        }
-        if (tryBankTradeForCity(board, logger, round)) {
-            return true;
-        }
+        if (tryBankTradeForSettlement(board, logger, round)) return true;
+        if (tryBankTradeForCity(board, logger, round))       return true;
         return tryBankTradeForRoad(board, logger, round);
     }
 
@@ -92,7 +88,6 @@ public abstract class Player {
         return new City(this).getCost().canAfford(resources);
     }
     private boolean canAffordRoad() {
-        // road costs 1 wood 1 brick
         return resources.getWood() >= 1 && resources.getBrick() >= 1;
     }
 
@@ -135,131 +130,90 @@ public abstract class Player {
     private boolean tryBankTradeForSettlement(Board board, ActionLogger logger, int round) {
         Node target = null;
         for (Node node : board.getNodes()) {
-            if (node.canBuildSettlement(this)) {
-                target = node;
-                break;
-            }
+            if (node.canBuildSettlement(this)) { target = node; break; }
         }
-        if (target == null) {
-            return false;
-        }
-        if (!tradeForMissingSingleResource(new Settlement(this).getCost(), logger, round)) {
-            return false;
-        }
+        if (target == null) return false;
+        if (!tradeForMissingSingleResource(new Settlement(this).getCost(), logger, round)) return false;
         return buildSettlementAt(target, logger, round);
     }
 
     private boolean tryBankTradeForCity(Board board, ActionLogger logger, int round) {
         Node target = null;
         for (Node node : board.getNodes()) {
-            if (node.canUpgradeToCity(this)) {
-                target = node;
-                break;
-            }
+            if (node.canUpgradeToCity(this)) { target = node; break; }
         }
-        if (target == null) {
-            return false;
-        }
-        if (!tradeForMissingSingleResource(new City(this).getCost(), logger, round)) {
-            return false;
-        }
+        if (target == null) return false;
+        if (!tradeForMissingSingleResource(new City(this).getCost(), logger, round)) return false;
         return buildCityAt(target, logger, round);
     }
 
     private boolean tryBankTradeForRoad(Board board, ActionLogger logger, int round) {
         Edge target = null;
         for (Edge edge : board.getEdges()) {
-            if (edge.canBuildRoad(this)) {
-                target = edge;
-                break;
-            }
+            if (edge.canBuildRoad(this)) { target = edge; break; }
         }
-        if (target == null) {
-            return false;
-        }
-        if (!tradeForMissingSingleResource(new Road(this, target).getCost(), logger, round)) {
-            return false;
-        }
+        if (target == null) return false;
+        if (!tradeForMissingSingleResource(new Road(this, target).getCost(), logger, round)) return false;
         return buildRoadAt(target, logger, round);
     }
 
     private boolean tradeForMissingSingleResource(ResourceCost cost, ActionLogger logger, int round) {
         ResourceType missing = findSingleMissingResource(cost);
-        if (missing == null) {
-            return false;
-        }
-
+        if (missing == null) return false;
         ResourceType give = findTradeSource(missing);
-        if (give == null || !resources.tradeFourToOne(give, missing)) {
-            return false;
-        }
-
+        if (give == null || !resources.tradeFourToOne(give, missing)) return false;
         logger.logAction(round, this, "Traded 4 " + give + " for 1 " + missing);
         return true;
     }
 
     private ResourceType findSingleMissingResource(ResourceCost cost) {
         ResourceType missing = null;
-
-        missing = updateMissingResource(missing, ResourceType.WOOD, cost.getWood());
+        missing = updateMissingResource(missing, ResourceType.WOOD,  cost.getWood());
         if (missing == ResourceType.DESERT) return null;
-
         missing = updateMissingResource(missing, ResourceType.BRICK, cost.getBrick());
         if (missing == ResourceType.DESERT) return null;
-
         missing = updateMissingResource(missing, ResourceType.SHEEP, cost.getSheep());
         if (missing == ResourceType.DESERT) return null;
-
         missing = updateMissingResource(missing, ResourceType.WHEAT, cost.getWheat());
         if (missing == ResourceType.DESERT) return null;
-
-        missing = updateMissingResource(missing, ResourceType.ORE, cost.getOre());
+        missing = updateMissingResource(missing, ResourceType.ORE,   cost.getOre());
         if (missing == ResourceType.DESERT) return null;
-
         return missing;
     }
 
     private ResourceType updateMissingResource(ResourceType currentMissing, ResourceType type, int required) {
         int deficit = required - resources.getCount(type);
-        if (deficit <= 0) {
-            return currentMissing;
-        }
-        if (deficit > 1 || currentMissing != null) {
-            return ResourceType.DESERT;
-        }
+        if (deficit <= 0) return currentMissing;
+        if (deficit > 1 || currentMissing != null) return ResourceType.DESERT;
         return type;
     }
 
     private ResourceType findTradeSource(ResourceType missing) {
         ResourceType chosen = null;
         int bestCount = 0;
-
         for (ResourceType candidate : List.of(
-            ResourceType.WOOD,
-            ResourceType.BRICK,
-            ResourceType.SHEEP,
-            ResourceType.WHEAT,
-            ResourceType.ORE
-        )) {
-            if (candidate == missing) {
-                continue;
-            }
+                ResourceType.WOOD, ResourceType.BRICK,
+                ResourceType.SHEEP, ResourceType.WHEAT, ResourceType.ORE)) {
+            if (candidate == missing) continue;
             int count = resources.getCount(candidate);
             if (count >= 4 && count > bestCount) {
                 chosen = candidate;
                 bestCount = count;
             }
         }
-
         return chosen;
     }
+
+    // -----------------------------------------------------------------------
+    // Direct build methods (used by AI and initial placement)
+    // Human turns go through CommandHistory instead — see GameSimulator
+    // -----------------------------------------------------------------------
 
     public boolean buildSettlementAt(Node node, ActionLogger logger, int round) {
         if (node == null) return false;
         Settlement s = new Settlement(this);
         if (!s.getCost().canAfford(resources) || !node.canBuildSettlement(this)) return false;
         if (!node.placeBuilding(s)) return false;
-
         s.getCost().deductFrom(resources);
         settlements.add(s);
         victoryPoints += s.getVictoryPoints();
@@ -272,13 +226,10 @@ public abstract class Player {
         City c = new City(this);
         if (!c.getCost().canAfford(resources) || !node.canUpgradeToCity(this)) return false;
         if (!node.upgradeToCity(c)) return false;
-
         c.getCost().deductFrom(resources);
-        if (!settlements.isEmpty()) {
-            settlements.remove(settlements.size() - 1);
-        }
+        if (!settlements.isEmpty()) settlements.remove(settlements.size() - 1);
         cities.add(c);
-        victoryPoints += 1; // net gain is +1 (was 1 for settlement, now 2 for city)
+        victoryPoints += 1;
         logger.logAction(round, this, "Upgraded settlement to city at node " + node.getId());
         return true;
     }
@@ -288,14 +239,39 @@ public abstract class Player {
         Road r = new Road(this, edge);
         if (!r.getCost().canAfford(resources) || !edge.canBuildRoad(this)) return false;
         if (!edge.placeRoad(r)) return false;
-
         r.getCost().deductFrom(resources);
         roads.add(r);
         logger.logAction(round, this, "Built road at edge " + edge.getId());
         return true;
     }
 
-    // initial placement stuff (free, no road connectivity needed)
+    // -----------------------------------------------------------------------
+    // Command Pattern helpers — called by Build*Command classes for undo/redo
+    // -----------------------------------------------------------------------
+
+    /** Add VP delta (positive or negative). Used by commands on execute/undo. */
+    public void addVictoryPoints(int delta) {
+        this.victoryPoints += delta;
+    }
+
+    public void addSettlement(Settlement s)  { settlements.add(s); }
+    public void removeSettlement(Settlement s) { settlements.remove(s); }
+
+    /** Remove and return the most recently added settlement (used by BuildCityCommand). */
+    public Settlement removeLastSettlement() {
+        if (settlements.isEmpty()) return null;
+        return settlements.remove(settlements.size() - 1);
+    }
+
+    public void addCity(City c)  { cities.add(c); }
+    public void removeCity(City c) { cities.remove(c); }
+
+    public void addRoad(Road r)  { roads.add(r); }
+    public void removeRoad(Road r) { roads.remove(r); }
+
+    // -----------------------------------------------------------------------
+    // Initial placement (free — no resource cost)
+    // -----------------------------------------------------------------------
 
     public void placeInitialSettlement(Node node) {
         Settlement s = new Settlement(this);
@@ -310,7 +286,6 @@ public abstract class Player {
         roads.add(r);
     }
 
-    // give starting resources from tiles adjacent to second settlement
     public void collectStartingResources(Node settlementNode) {
         for (Tile tile : settlementNode.getAdjacentTiles()) {
             ResourceType res = tile.getResourceType();
@@ -327,9 +302,7 @@ public abstract class Player {
     public int discardRandomCards(int count, Random random) {
         int discarded = 0;
         for (int i = 0; i < count; i++) {
-            if (resources.removeRandomResource(random) == null) {
-                break;
-            }
+            if (resources.removeRandomResource(random) == null) break;
             discarded++;
         }
         return discarded;
@@ -339,17 +312,18 @@ public abstract class Player {
         return resources.removeRandomResource(random);
     }
 
-    public int getId() { return id; }
-    public String getName() { return name; }
-    public PlayerColor getColor() { return color; }
-    public int getVictoryPoints() { return victoryPoints; }
+    public int getId()             { return id; }
+    public String getName()        { return name; }
+    public PlayerColor getColor()  { return color; }
+    public int getVictoryPoints()  { return victoryPoints; }
     public ResourceHand getResources() { return resources; }
-    public int getRoadCount() { return roads.size(); }
+    public int getRoadCount()       { return roads.size(); }
     public int getSettlementCount() { return settlements.size(); }
-    public int getCityCount() { return cities.size(); }
+    public int getCityCount()       { return cities.size(); }
 
     @Override
     public String toString() {
-        return "Player[" + id + ", " + name + ", VP=" + victoryPoints + ", cards=" + resources.getTotalCards() + "]";
+        return "Player[" + id + ", " + name + ", VP=" + victoryPoints
+            + ", cards=" + resources.getTotalCards() + "]";
     }
 }

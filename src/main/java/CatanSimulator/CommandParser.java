@@ -16,6 +16,11 @@ public class CommandParser {
         Pattern.compile("^\\s*build\\s+city\\s+(\\d+)\\s*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern BUILD_ROAD_PATTERN =
         Pattern.compile("^\\s*build\\s+road\\s+(\\d+)\\s*,\\s*(\\d+)\\s*$", Pattern.CASE_INSENSITIVE);
+    // NEW: undo and redo patterns
+    private static final Pattern UNDO_PATTERN =
+        Pattern.compile("^\\s*undo\\s*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern REDO_PATTERN =
+        Pattern.compile("^\\s*redo\\s*$", Pattern.CASE_INSENSITIVE);
 
     public Command parse(String input) {
         String rawInput = input == null ? "" : input;
@@ -28,6 +33,12 @@ public class CommandParser {
         }
         if (LIST_PATTERN.matcher(rawInput).matches()) {
             return Command.simple(CommandType.LIST, rawInput);
+        }
+        if (UNDO_PATTERN.matcher(rawInput).matches()) {
+            return Command.simple(CommandType.UNDO, rawInput);
+        }
+        if (REDO_PATTERN.matcher(rawInput).matches()) {
+            return Command.simple(CommandType.REDO, rawInput);
         }
 
         Matcher settlementMatcher = BUILD_SETTLEMENT_PATTERN.matcher(rawInput);
@@ -59,5 +70,9 @@ public class CommandParser {
         }
 
         return Command.invalid(rawInput);
+    }
+
+    public boolean validateSyntax(String input) {
+        return !parse(input).getType().equals(CommandType.INVALID);
     }
 }
