@@ -153,10 +153,8 @@ public class GameSimulator {
         int diceRoll = player.rollDice(dice);
         handleDiceRoll(player, diceRoll);
 
-        boolean built = player.takeTurn(board, logger, currentTurnId);
-        if (!built) {
-            built = player.tryBankTradeForBuild(board, logger, currentTurnId);
-        }
+        boolean built = (player instanceof AIPlayer)
+            && ((AIPlayer) player).takeStrategicTurn(board, players, logger, currentTurnId);
 
         if (built) {
             exporter.export(board);
