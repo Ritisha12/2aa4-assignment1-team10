@@ -1,5 +1,6 @@
 package CatanSimulator;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,7 +29,7 @@ public abstract class Player {
         this.roads = new ArrayList<>();
         this.settlements = new ArrayList<>();
         this.cities = new ArrayList<>();
-        this.random = new Random();
+        this.random = new SecureRandom();
     }
 
     public int rollDice(Dice dice) {

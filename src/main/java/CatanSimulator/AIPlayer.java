@@ -1,5 +1,6 @@
 package CatanSimulator;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ public class AIPlayer extends Player {
     public AIPlayer(int id, String name, PlayerColor color, AiTurnStrategy strategy) {
         super(id, name, color);
         this.strategy = strategy;
-        this.random = new Random();
+        this.random = new SecureRandom();
     }
 
     public boolean takeStrategicTurn(Board board, List<Player> players, ActionLogger logger, int round) {

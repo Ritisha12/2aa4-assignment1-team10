@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -42,7 +43,7 @@ public class GameSimulator {
         players = new ArrayList<>();
         dice = new Dice();
         logger = new ActionLogger();
-        random = new Random();
+        random = new SecureRandom();
         this.input = input;
         this.output = output;
         exporter = new GameStateExporter(Path.of("target", "visualizer", "state.json"));
